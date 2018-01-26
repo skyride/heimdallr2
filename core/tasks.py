@@ -42,6 +42,7 @@ def parse_redisq(json):
     km.save()
 
     # Populate attackers
+    attackers = []
     for attacker in killmail['attackers']:
         a = Attacker(
             kill=km,
@@ -62,6 +63,7 @@ def parse_redisq(json):
         if "weapon_type_id" in attacker:
             a.weapon_id = attacker['weapon_type_id']
         a.save()
+        attackers.append(a)
 
     # Populate Items
     for item in victim['items']:
@@ -76,7 +78,7 @@ def parse_redisq(json):
             i.quantity = item['quantity_dropped']
         if "quantity_destroyed" in item:
             i.quantity = item['quantity_destroyed']
-        i.save()
+        items.save()
 
     print(
         "Added Kill ID %s with %s attackers" % (

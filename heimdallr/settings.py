@@ -45,7 +45,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'dkill.urls'
+ROOT_URLCONF = 'heimdallr.urls'
 
 TEMPLATES = [
     {
@@ -61,7 +61,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'dkill.wsgi.application'
+WSGI_APPLICATION = 'heimdallr.wsgi.application'
 
 
 # Database

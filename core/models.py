@@ -134,6 +134,8 @@ class Character(models.Model):
 # Instance of a killmail
 class Killmail(models.Model):
     id = models.BigIntegerField(primary_key=True)
+    date = models.DateTimeField(db_index=True)
+    system = models.ForeignKey(System, related_name="kills", on_delete=models.CASCADE)
 
     # Victim
     character = models.ForeignKey(Character, related_name="losses", null=True, default=None, on_delete=models.SET_NULL)
@@ -142,13 +144,15 @@ class Killmail(models.Model):
 
     # Meta
     ship = models.ForeignKey(Type, related_name="attackers_ship", null=True, default=None, on_delete=models.CASCADE)
-    weapon = models.ForeignKey(Type, null=True, related_name="attackers_weapon", default=None, on_delete=models.CASCADE)
-
-    system = models.ForeignKey(System, related_name="kills", on_delete=models.CASCADE)
-    date = models.DateTimeField(db_index=True)
-    added = models.DateTimeField(auto_now_add=True)
 
     value = models.DecimalField(max_digits=20, decimal_places=2, db_index=True)
+    damage = models.IntegerField(db_index=True)
+
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+
+    added = models.DateTimeField(auto_now_add=True)
 
 
 # Instance of an attacker on a killmail

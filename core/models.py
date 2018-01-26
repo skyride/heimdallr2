@@ -175,5 +175,5 @@ class Item(models.Model):
     kill = models.ForeignKey(Killmail, related_name="items", on_delete=models.CASCADE)
     type = models.ForeignKey(Type, related_name="kill_items", on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    singleton = models.BooleanField()
+    singleton = models.IntegerField()
     flag = models.IntegerField()

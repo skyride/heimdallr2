@@ -52,7 +52,7 @@ class Corporation(models.Model):
     alliance = models.ForeignKey(Alliance, related_name="corporations", null=True, default=None, on_delete=models.SET_NULL)
     is_closed = models.BooleanField(default=False, db_index=True)
 
-    founded = models.DateTimeField()
+    founded = models.DateTimeField(null=True, default=None)
     created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 
@@ -79,10 +79,11 @@ class Corporation(models.Model):
                 o = Corporation(
                     id=id,
                     name=r['name'],
-                    ticker=r['ticker'],
-                    founded=parse_datetime(r['date_founded'])
+                    ticker=r['ticker']
                 )
 
+                if "date_founded" in r:
+                    o.founded = parse_datetime(r['date_founded'])
                 if "alliance_id" in r:
                     o.alliance = Alliance.get_or_create(r['alliance_id'])
                 if r['member_count'] == 0:
@@ -163,7 +164,16 @@ class Attacker(models.Model):
     corporation = models.ForeignKey(Corporation, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
     alliance = models.ForeignKey(Alliance, null=True, related_name="kills", default=None, on_delete=models.SET_NULL)
 
-    ship = models.ForeignKey(Type,related_name="victim_ship", null=True, default=None, on_delete=models.CASCADE)
+    ship = models.ForeignKey(Type, related_name="victim_ship", null=True, default=None, on_delete=models.CASCADE)
     weapon = models.ForeignKey(Type, null=True, related_name="victim_weapon", default=None, on_delete=models.CASCADE)
+    final_blow = models.BooleanField(default=False)
 
     damage = models.IntegerField(db_index=True)
+
+
+class Item(models.Model):
+    kill = models.ForeignKey(Killmail, related_name="items", on_delete=models.CASCADE)
+    type = models.ForeignKey(Type, related_name="kill_items", on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    singleton = models.BooleanField()
+    flag = models.IntegerField()

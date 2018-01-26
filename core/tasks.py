@@ -2,20 +2,22 @@ import ujson
 
 from django.utils.dateparse import parse_datetime
 
-from core.models import Killmail, Attacker, Character, Corporation, Alliance
+from heimdallr.celery import app
+from core.models import Killmail, Attacker, Item, Character, Corporation, Alliance
 from sde.models import System, Type
 
 
+@app.task(name="parse_redisq")
 def parse_redisq(json):
     package = ujson.loads(json)['package']
     killmail = package['killmail']
     victim = killmail['victim']
-    items = victim['items']
     position = victim['position']
     zkb = package['zkb']
 
     # Check the KM doesn't already exist
     if Killmail.objects.filter(id=package['killID']).count() > 0:
+        print("Kill ID %s already exists" % package['killID'])
         return
 
     # Populate killmail
@@ -47,6 +49,8 @@ def parse_redisq(json):
             damage=attacker['damage_done']
         )
 
+        if "final_blow" in attacker:
+            a.final_blow = attacker['final_blow']
         if "character_id" in attacker:
             a.character = Character.get_or_create(attacker['character_id'])
         if "corporation_id" in attacker:
@@ -61,5 +65,30 @@ def parse_redisq(json):
 
         attackers.append(a)
     Attacker.objects.bulk_create(attackers)
+
+    # Populate Items
+    items = []
+    for item in victim['items']:
+        i = Item(
+            kill=km,
+            type_id=item['item_type_id'],
+            singleton=item['singleton'],
+            flag=item['flag']
+        )
+
+        if "quantity_dropped" in item:
+            i.quantity = item['quantity_dropped']
+        if "quantity_destroyed" in item:
+            i.quantity = item['quantity_destroyed']
+        items.append(i)
+
+    Item.objects.bulk_create(items)
+
+    print(
+        "Added Kill ID %s with %s attackers" % (
+            km.id,
+            len(attackers)
+        )
+    )
 
     

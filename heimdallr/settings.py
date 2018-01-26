@@ -107,13 +107,25 @@ STATIC_URL = '/static/'
 ESI_BASE = "https://esi.tech.ccp.is"
 
 
+# Celery
+# Celery
+CELERY_IGNORE_RESULT = False
+CELERY_TASK_RESULT_EXPIRES = 1200
+
+CELERY_DISABLE_RATE_LIMITS = True
+CELERYD_TASK_SOFT_TIME_LIMIT = 300
+CELERYD_PREFETCH_MULTIPLIER = 1
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+
+BROKER_URL = "redis://127.0.0.1:6379/1"
+
+
 # Local Settings
 from .local_settings import *
 
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
 DATABASES = {
     'default': DATABASE,
     'sde': {

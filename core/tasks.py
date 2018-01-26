@@ -78,7 +78,7 @@ def parse_redisq(json):
             i.quantity = item['quantity_dropped']
         if "quantity_destroyed" in item:
             i.quantity = item['quantity_destroyed']
-        items.save()
+        i.save()
 
     print(
         "Added Kill ID %s with %s attackers" % (

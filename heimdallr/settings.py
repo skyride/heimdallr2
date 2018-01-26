@@ -64,21 +64,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'heimdallr.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    },
-    'sde': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'sqlite-latest.sqlite'),
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
@@ -120,3 +105,19 @@ STATIC_URL = '/static/'
 
 # API Settings
 ESI_BASE = "https://esi.tech.ccp.is"
+
+
+# Local Settings
+from .local_settings import *
+
+
+# Database
+# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
+
+DATABASES = {
+    'default': DATABASE,
+    'sde': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'sqlite-latest.sqlite'),
+    }
+}

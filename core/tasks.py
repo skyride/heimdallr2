@@ -26,10 +26,7 @@ def parse_redisq(json):
         system_id=killmail['solar_system_id'],
         ship_id=victim['ship_type_id'],
         value=zkb['totalValue'],
-        damage=victim['damage_taken'],
-        x=position['x'],
-        y=position['y'],
-        z=position['z']
+        damage=victim['damage_taken']
     )
 
     if "position" in victim['position']:

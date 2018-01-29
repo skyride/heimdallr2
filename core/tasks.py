@@ -88,7 +88,7 @@ def parse_redisq(json):
     )
 
 
-
+@app.task(name="parse_zkill_api")
 def parse_zkill_api(json):
     package = ujson.loads(json)
     victim = package['victim']

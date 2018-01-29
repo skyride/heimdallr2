@@ -12,7 +12,6 @@ class Alliance(models.Model):
     ticker = models.CharField(max_length=5, db_index=True)
 
     founded = models.DateTimeField()
-    created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -53,7 +52,6 @@ class Corporation(models.Model):
     is_closed = models.BooleanField(default=False, db_index=True)
 
     founded = models.DateTimeField(null=True, default=None)
-    created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -99,7 +97,7 @@ class Character(models.Model):
     birthday = models.DateTimeField()
     corporation = models.ForeignKey(Corporation, related_name="characters", on_delete=models.CASCADE)
 
-    created = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s:%s" % (

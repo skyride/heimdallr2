@@ -30,9 +30,10 @@ def parse_redisq(json):
     )
 
     if "position" in victim:
-        km.x = victim['position']['x']
-        km.y = victim['position']['y']
-        km.z = victim['position']['z']
+        if "x" in victim['position']['x']:
+            km.x = victim['position']['x']
+            km.y = victim['position']['y']
+            km.z = victim['position']['z']
 
     if "character_id" in victim:
         km.character = Character.get_or_create(victim['character_id'])

@@ -29,7 +29,7 @@ def parse_redisq(json):
         damage=victim['damage_taken']
     )
 
-    if "position" in victim['position']:
+    if "position" in victim:
         km.x = victim['position']['x']
         km.y = victim['position']['y']
         km.z = victim['position']['z']

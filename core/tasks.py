@@ -12,7 +12,6 @@ def parse_redisq(json):
     package = ujson.loads(json)['package']
     killmail = package['killmail']
     victim = killmail['victim']
-    position = victim['position']
     zkb = package['zkb']
 
     # Check the KM doesn't already exist
@@ -32,6 +31,11 @@ def parse_redisq(json):
         y=position['y'],
         z=position['z']
     )
+
+    if "position" in victim['position']:
+        km.x = victim['position']['x']
+        km.y = victim['position']['y']
+        km.z = victim['position']['z']
 
     if "character_id" in victim:
         km.character = Character.get_or_create(victim['character_id'])

@@ -147,9 +147,9 @@ class Killmail(models.Model):
     value = models.DecimalField(max_digits=20, decimal_places=2, db_index=True)
     damage = models.IntegerField(db_index=True)
 
-    x = models.FloatField()
-    y = models.FloatField()
-    z = models.FloatField()
+    x = models.FloatField(null=True, default=None)
+    y = models.FloatField(null=True, default=None)
+    z = models.FloatField(null=True, default=None)
 
     added = models.DateTimeField(auto_now_add=True)
 

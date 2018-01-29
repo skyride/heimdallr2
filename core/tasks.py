@@ -93,7 +93,6 @@ def parse_redisq(json):
 def parse_zkill_api(json):
     package = ujson.loads(json)
     victim = package['victim']
-    position = victim['position']
     zkb = package['zkb']
 
     # Check the KM doesn't already exist
@@ -108,10 +107,7 @@ def parse_zkill_api(json):
         system_id=package['solar_system_id'],
         ship_id=victim['ship_type_id'],
         value=zkb['totalValue'],
-        damage=victim['damage_taken'],
-        x=position['x'],
-        y=position['y'],
-        z=position['z']
+        damage=victim['damage_taken']
     )
 
     if "position" in victim:

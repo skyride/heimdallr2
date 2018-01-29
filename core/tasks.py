@@ -30,10 +30,9 @@ def parse_redisq(json):
     )
 
     if "position" in victim:
-        if "x" in victim['position']['x']:
-            km.x = victim['position']['x']
-            km.y = victim['position']['y']
-            km.z = victim['position']['z']
+        km.x = victim['position']['x']
+        km.y = victim['position']['y']
+        km.z = victim['position']['z']
 
     if "character_id" in victim:
         km.character = Character.get_or_create(victim['character_id'])
@@ -114,6 +113,12 @@ def parse_zkill_api(json):
         y=position['y'],
         z=position['z']
     )
+
+    if "position" in victim:
+        if "x" in victim['position']:
+            km.x = victim['position']['x']
+            km.y = victim['position']['y']
+            km.z = victim['position']['z']
 
     if "character_id" in victim:
         km.character = Character.get_or_create(victim['character_id'])

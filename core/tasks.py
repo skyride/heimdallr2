@@ -11,18 +11,38 @@ from core.models import Killmail, Attacker, Item, Character, Corporation, Allian
 from sde.models import System, Type
 
 
+
+
+
 @app.task(name="fetch_character_kills")
 def fetch_character_kills(id):
     char = Character.get_or_create(id)
     url = "https://zkillboard.com/api/characterID/%s/page/%s/"
+    _fetch_kills(char, url)
 
+
+@app.task(name="fetch_corporation_kills")
+def fetch_corporation_kills(id):
+    corp = Corporation.get_or_create(id)
+    url = "https://zkillboard.com/api/corporationID/%s/page/%s/"
+    _fetch_kills(corp, url)
+
+
+@app.task(name="fetch_alliance_kills")
+def fetch_alliance_kills(id):
+    alliance = Alliance.get_or_create(id)
+    url = "https://zkillboard.com/api/allianceID/%s/page/%s/"
+    _fetch_kills(alliance, url)
+
+
+def _fetch_kills(obj, url):
     limit = make_aware(datetime(2013, 1, 1))
     
     i = 1
     count = 0
     pages = 0
     while True:
-        rs = requests.get(url % (id, i))
+        rs = requests.get(url % (obj.id, i))
         if rs.status_code == 200:
             rs = rs.json()
 
@@ -46,8 +66,8 @@ def fetch_character_kills(id):
         "Fetched %s kills from %s pages for %s:%s" % (
             count,
             pages,
-            char.id,
-            char.name
+            obj.id,
+            obj.name
         )
     )
 

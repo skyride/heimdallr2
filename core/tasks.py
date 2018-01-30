@@ -16,7 +16,7 @@ def fetch_character_kills(id):
     char = Character.get_or_create(id)
     url = "https://zkillboard.com/api/characterID/%s/page/%s/"
 
-    limit = make_aware(datetime(2016, 1, 1))
+    limit = make_aware(datetime(2013, 1, 1))
     
     i = 1
     count = 0

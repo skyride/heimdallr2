@@ -232,7 +232,7 @@ def parse_zkill_api(json):
         items.append(i)
 
     print(
-        "Added historical from %s Kill ID %s with %s attackers" % (
+        "Added historical Kill ID %s on %s with %s attackers" % (
             km.date.strftime("%d/%m/%Y %H:%M"),
             km.id,
             len(attackers)

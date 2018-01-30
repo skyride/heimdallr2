@@ -36,7 +36,7 @@ def fetch_alliance_kills(id):
 
 
 def _fetch_kills(obj, url):
-    limit = make_aware(datetime(2013, 1, 1))
+    limit = make_aware(datetime(2015, 10, 1))
     
     i = 1
     count = 0

@@ -1,10 +1,55 @@
+from datetime import datetime
+
 import ujson
+import requests
 
 from django.utils.dateparse import parse_datetime
+from django.utils.timezone import make_aware
 
 from heimdallr.celery import app
 from core.models import Killmail, Attacker, Item, Character, Corporation, Alliance
 from sde.models import System, Type
+
+
+@app.task(name="fetch_character_kills")
+def fetch_character_kills(id):
+    char = Character.get_or_create(id)
+    url = "https://zkillboard.com/api/characterID/%s/page/%s/"
+
+    limit = make_aware(datetime(2016, 1, 1))
+    
+    i = 1
+    count = 0
+    pages = 0
+    while True:
+        rs = requests.get(url % (id, i))
+        if rs.status_code == 200:
+            rs = rs.json()
+
+            if len(rs) > 0:
+                pages = pages + 1
+
+                for r in rs:
+                    parse_zkill_api.delay(ujson.dumps(r))
+                    count = count + 1
+                
+                if parse_datetime(rs[-1]['killmail_time']) < limit:
+                    break
+            else:
+                break
+        else:
+            break
+
+        i = i + 1
+
+    print(
+        "Fetched %s kills from %s pages for %s:%s" % (
+            count,
+            pages,
+            char.id,
+            char.name
+        )
+    )
 
 
 @app.task(name="parse_redisq")

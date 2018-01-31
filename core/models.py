@@ -130,9 +130,15 @@ class Character(models.Model):
                 return o
 
 
+# Source of the killmail
+class Source(models.Model):
+    name = models.CharField(max_length=32, db_index=True)
+
+
 # Instance of a killmail
 class Killmail(models.Model):
     id = models.BigIntegerField(primary_key=True)
+    source = models.ForeignKey(Source, related_name="kills", default=0, on_delete=models.CASCADE)
     date = models.DateTimeField(db_index=True)
     system = models.ForeignKey(System, related_name="kills", on_delete=models.CASCADE)
 

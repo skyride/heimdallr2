@@ -8,6 +8,7 @@ from django.utils.dateparse import parse_datetime
 from django.utils.timezone import make_aware
 
 from heimdallr.celery import app
+from core.helpers import parse_crest_date
 from core.models import Killmail, Attacker, Item, Character, Corporation, Alliance
 from sde.models import System, Type
 
@@ -153,7 +154,7 @@ def parse_redisq(json):
     Item.objects.bulk_create(items)
 
     print(
-        "Added Kill ID %s with %s attackers" % (
+        "Added Kill ID %s with %s attackers from Redisq" % (
             km.id,
             len(attackers)
         )
@@ -239,7 +240,95 @@ def parse_zkill_api(json):
         items.append(i)
 
     print(
-        "Added Kill ID %s on %s with %s attackers" % (
+        "Added Kill ID %s on %s with %s attackers from zkill API" % (
+            km.id,
+            km.date.strftime("%d/%m/%Y %H:%M"),
+            len(attackers)
+        )
+    )
+
+
+@app.task(name="parse_crest")
+def parse_crest(json):
+    package = ujson.loads(json)
+    victim = package['victim']
+
+    # Check the KM doesn't already exist
+    if Killmail.objects.filter(id=package['killID']).count() > 0:
+        print("Kill ID %s already exists" % package['killID'])
+        return
+
+    # Populate killmail
+    km = Killmail(
+        id=package['killID'],
+        source_id=4,
+        date=parse_crest_date(package['killTime']),
+        system_id=package['solarSystem']['id'],
+        ship_id=victim['shipType']['id'],
+        value=0,
+        damage=victim['damageTaken']
+    )
+
+    if "position" in victim:
+        if "x" in victim['position']:
+            km.x = victim['position']['x']
+            km.y = victim['position']['y']
+            km.z = victim['position']['z']
+
+    if "character" in victim:
+        km.character = Character.get_or_create(victim['character']['id'])
+    if "corporation" in victim:
+        km.corporation = Corporation.get_or_create(victim['corporation']['id'])
+    if "alliance" in victim:
+        km.alliance = Alliance.get_or_create(victim['alliance']['id'])
+
+    km.save()
+
+    # Populate attackers
+    attackers = []
+    for attacker in package['attackers']:
+        a = Attacker(
+            kill=km,
+            damage=attacker['damageDone']
+        )
+
+        if "final_blow" in attacker:
+            a.final_blow = attacker['finalBlow']
+        if "character" in attacker:
+            a.character = Character.get_or_create(attacker['character']['id'])
+        if "corporation" in attacker:
+            a.corporation = Corporation.get_or_create(attacker['corporation']['id'])
+        if "alliance" in attacker:
+            a.alliance = Alliance.get_or_create(attacker['alliance']['id'])
+
+        if "shipType" in attacker:
+            a.ship_id = attacker['shipType']['id']
+        if "weaponType" in attacker:
+            a.weapon_id = attacker['weaponType']['id']
+        #a.save()
+        attackers.append(a)
+    Attacker.objects.bulk_create(attackers)
+
+    # Populate Items
+    items = []
+    for item in victim['items']:
+        i = Item(
+            kill=km,
+            type_id=item['itemType']['id'],
+            singleton=item['singleton'],
+            flag=item['flag']
+        )
+
+        if "quantityDropped" in item:
+            i.quantity = item['quantityDropped']
+        if "quantityDestroyed" in item:
+            i.quantity = item['quantityDestroyed']
+        #i.save()
+        items.append(i)
+    Item.objects.bulk_create(items)
+
+    print(
+        "Added Kill ID %s on %s with %s attackers from CREST" % (
             km.id,
             km.date.strftime("%d/%m/%Y %H:%M"),
             len(attackers)

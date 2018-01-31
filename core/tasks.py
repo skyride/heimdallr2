@@ -249,14 +249,18 @@ def parse_zkill_api(json):
 
 
 @app.task(name="parse_crest")
-def parse_crest(json):
-    package = ujson.loads(json)
+def parse_crest(json, keyhash=None):
+    if keyhash == None:
+        package = ujson.loads(json)
+        if Killmail.objects.filter(id=package['killID']).count() > 0:
+            print("Kill ID %s already exists" % package['killID'])
+            return
+    else:
+        package = requests.get("https://crest-tq.eveonline.com/killmails/%s/%s/" % keyhash).json()
+        if Killmail.objects.filter(id=keyhash[0]).count() > 0:
+            print("Kill ID %s already exists" % keyhash[0])
+            return
     victim = package['victim']
-
-    # Check the KM doesn't already exist
-    if Killmail.objects.filter(id=package['killID']).count() > 0:
-        print("Kill ID %s already exists" % package['killID'])
-        return
 
     # Populate killmail
     km = Killmail(

@@ -132,6 +132,7 @@ class Character(models.Model):
 
 # Source of the killmail
 class Source(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=32, db_index=True)
 
 

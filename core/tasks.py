@@ -256,10 +256,7 @@ def parse_crest(json, keyhash=None):
             print("Kill ID %s already exists" % package['killID'])
             return
     else:
-        package = requests.get("https://crest-tq.eveonline.com/killmails/%s/%s/" % keyhash).json()
-        if Killmail.objects.filter(id=keyhash[0]).count() > 0:
-            print("Kill ID %s already exists" % keyhash[0])
-            return
+        package = requests.get("https://crest-tq.eveonline.com/killmails/%s/%s/" % (keyhash[0], keyhash[1])).json()
     victim = package['victim']
 
     # Populate killmail

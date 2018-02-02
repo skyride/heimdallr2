@@ -13,7 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
+from django.urls import re_path
+
+from . import views
 
 urlpatterns = [
+    # Autocomplete
+    re_path(r'autocomplete/character/(.+)', views.autocomplete_character, name="autocomplete_character"),
+    re_path(r'autocomplete/corporation/(.+)', views.autocomplete_corporation, name="autocomplete_corporation"),
+    re_path(r'autocomplete/alliance/(.+)', views.autocomplete_alliance, name="autocomplete_alliance"),
 ]

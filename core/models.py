@@ -158,7 +158,7 @@ class Killmail(models.Model):
 
 # People involved with the killmail
 class Involved(models.Model):
-    kill = models.ForeignKey(Killmail, related_name="attackers", on_delete=models.CASCADE)
+    kill = models.ForeignKey(Killmail, related_name="involved", on_delete=models.CASCADE)
 
     character = models.ForeignKey(Character, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
     corporation = models.ForeignKey(Corporation, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)

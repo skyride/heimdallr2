@@ -9,7 +9,7 @@ from django.utils.timezone import make_aware
 
 from heimdallr.celery import app
 from core.helpers import parse_crest_date
-from core.models import Killmail, Attacker, Item, Character, Corporation, Alliance
+from core.models import Killmail, Involved, Item, Character, Corporation, Alliance
 from sde.models import System, Type
 
 
@@ -102,18 +102,24 @@ def parse_redisq(json):
         km.y = victim['position']['y']
         km.z = victim['position']['z']
 
+    db_victim = Involved(
+        kill=km,
+        attacker=False,
+        ship_id=victim['ship_type_id'],
+        damage=0
+    )
     if "character_id" in victim:
-        km.character = Character.get_or_create(victim['character_id'])
+        db_victim.character = Character.get_or_create(victim['character_id'])
     if "corporation_id" in victim:
-        km.corporation = Corporation.get_or_create(victim['corporation_id'])
+        db_victim.corporation = Corporation.get_or_create(victim['corporation_id'])
     if "alliance_id" in victim:
-        km.alliance = Alliance.get_or_create(victim['alliance_id'])
+        db_victim.alliance = Alliance.get_or_create(victim['alliance_id'])
     km.save()
 
-    # Populate attackers
-    attackers = []
+    # Populate Involved
+    attackers = [db_victim]
     for attacker in killmail['attackers']:
-        a = Attacker(
+        a = Involved(
             kill=km,
             damage=attacker['damage_done']
         )
@@ -133,7 +139,7 @@ def parse_redisq(json):
             a.weapon_id = attacker['weapon_type_id']
         #a.save()
         attackers.append(a)
-    Attacker.objects.bulk_create(attackers)
+    Involved.objects.bulk_create(attackers)
 
     # Populate Items
     items = []

@@ -195,19 +195,25 @@ def parse_zkill_api(json):
             km.y = victim['position']['y']
             km.z = victim['position']['z']
 
+    db_victim = Involved(
+        kill=km,
+        attacker=False,
+        ship_id=victim['ship_type_id'],
+        damage=0
+    )
     if "character_id" in victim:
-        km.character = Character.get_or_create(victim['character_id'])
+        db_victim.character = Character.get_or_create(victim['character_id'])
     if "corporation_id" in victim:
-        km.corporation = Corporation.get_or_create(victim['corporation_id'])
+        db_victim.corporation = Corporation.get_or_create(victim['corporation_id'])
     if "alliance_id" in victim:
-        km.alliance = Alliance.get_or_create(victim['alliance_id'])
+        db_victim.alliance = Alliance.get_or_create(victim['alliance_id'])
 
     km.save()
 
     # Populate attackers
-    attackers = []
+    attackers = [db_victim]
     for attacker in package['attackers']:
-        a = Attacker(
+        a = Involved(
             kill=km,
             damage=attacker['damage_done']
         )
@@ -225,8 +231,9 @@ def parse_zkill_api(json):
             a.ship_id = attacker['ship_type_id']
         if "weapon_type_id" in attacker:
             a.weapon_id = attacker['weapon_type_id']
-        a.save()
+        #a.save()
         attackers.append(a)
+    Involved.objects.bulk_create(attackers)
 
     # Populate Items
     items = []
@@ -242,8 +249,9 @@ def parse_zkill_api(json):
             i.quantity = item['quantity_dropped']
         if "quantity_destroyed" in item:
             i.quantity = item['quantity_destroyed']
-        i.save()
+        #i.save()
         items.append(i)
+    Item.objects.bulk_create(items)
 
     print(
         "Added Kill ID %s on %s with %s attackers from zkill API" % (

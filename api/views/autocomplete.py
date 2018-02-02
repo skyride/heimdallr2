@@ -16,14 +16,11 @@ TOO_SHORT_ERROR = {
 def autocomplete_character(request, name):
     return _autocomplete(request, name, Character, "involved")
 
-
 def autocomplete_corporation(request, name):
     return _autocomplete(request, name, Corporation, "involved")
 
-
 def autocomplete_alliance(request, name):
     return _autocomplete(request ,name, Alliance, "involved")
-
 
 def autocomplete_system(request, name):
     return _autocomplete(request, name, System, "kills", ["region__name"])

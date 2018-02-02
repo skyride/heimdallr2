@@ -25,4 +25,5 @@ urlpatterns = [
     re_path(r'autocomplete/system/(.+)', views.autocomplete_system, name="autocomplete_system"),
     re_path(r'autocomplete/constellation/(.+)', views.autocomplete_constellation, name="autocomplete_constellation"),
     re_path(r'autocomplete/region/(.*)', views.autocomplete_region, name="autocomplete_region"),
+    re_path(r'autocomplete/ship/(.*)', views.autocomplete_ship, name="autocomplete_ship"),
 ]

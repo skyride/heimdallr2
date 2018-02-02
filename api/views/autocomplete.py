@@ -33,13 +33,19 @@ def autocomplete_region(request, name):
     return _autocomplete(request, name, Region, "systems__kills", min_length=0)
 
 # SDE Entities
+def autocomplete_ship(request, name):
+    extra_filters = {
+        "group__category_id__in": [6, 65],
+        "published": True
+    }
+    return _autocomplete(request, name, Type, "involved_ship", ["group__name"], extra_filters)
 
 
-
-def _autocomplete(request, name, Model, count, extra_values=[], min_length=3):
+def _autocomplete(request, name, Model, count, extra_values=[], extra_filters={}, min_length=3):
     if len(name) >= min_length:
         out = Model.objects.filter(
-            name__istartswith=name
+            name__istartswith=name,
+            **extra_filters
         ).annotate(
             order_key=Count(count)
         ).order_by(

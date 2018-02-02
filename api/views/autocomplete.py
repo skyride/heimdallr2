@@ -12,7 +12,7 @@ TOO_SHORT_ERROR = {
     "message": "You must provide a search term at least 3 characters long"
 }
 
-
+# Player Entities
 def autocomplete_character(request, name):
     return _autocomplete(request, name, Character, "involved")
 
@@ -22,6 +22,7 @@ def autocomplete_corporation(request, name):
 def autocomplete_alliance(request, name):
     return _autocomplete(request ,name, Alliance, "involved")
 
+# Map Entities
 def autocomplete_system(request, name):
     return _autocomplete(request, name, System, "kills", ["region__name"])
 
@@ -30,6 +31,9 @@ def autocomplete_constellation(request, name):
 
 def autocomplete_region(request, name):
     return _autocomplete(request, name, Region, "systems__kills", min_length=0)
+
+# SDE Entities
+
 
 
 def _autocomplete(request, name, Model, count, extra_values=[], min_length=3):

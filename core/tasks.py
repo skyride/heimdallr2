@@ -290,19 +290,25 @@ def parse_crest(json, keyhash=None):
             km.y = victim['position']['y']
             km.z = victim['position']['z']
 
+    db_victim = Involved(
+        kill=km,
+        attacker=False,
+        ship_id=victim['shipType']['id'],
+        damage=0
+    )
     if "character" in victim:
-        km.character = Character.get_or_create(victim['character']['id'])
+        db_victim.character = Character.get_or_create(victim['character']['id'])
     if "corporation" in victim:
-        km.corporation = Corporation.get_or_create(victim['corporation']['id'])
+        db_victim.corporation = Corporation.get_or_create(victim['corporation']['id'])
     if "alliance" in victim:
-        km.alliance = Alliance.get_or_create(victim['alliance']['id'])
+        db_victim.alliance = Alliance.get_or_create(victim['alliance']['id'])
 
     km.save()
 
     # Populate attackers
-    attackers = []
+    attackers = [db_victim]
     for attacker in package['attackers']:
-        a = Attacker(
+        a = Involved(
             kill=km,
             damage=attacker['damageDone']
         )
@@ -322,7 +328,7 @@ def parse_crest(json, keyhash=None):
             a.weapon_id = attacker['weaponType']['id']
         #a.save()
         attackers.append(a)
-    Attacker.objects.bulk_create(attackers)
+    Involved.objects.bulk_create(attackers)
 
     # Populate Items
     items = []

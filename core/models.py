@@ -160,9 +160,9 @@ class Killmail(models.Model):
 class Involved(models.Model):
     kill = models.ForeignKey(Killmail, related_name="involved", on_delete=models.CASCADE)
 
-    character = models.ForeignKey(Character, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
-    corporation = models.ForeignKey(Corporation, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
-    alliance = models.ForeignKey(Alliance, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
+    character = models.ForeignKey(Character, related_name="involved", null=True, default=None, on_delete=models.SET_NULL)
+    corporation = models.ForeignKey(Corporation, related_name="involved", null=True, default=None, on_delete=models.SET_NULL)
+    alliance = models.ForeignKey(Alliance, related_name="involved", null=True, default=None, on_delete=models.SET_NULL)
 
     attacker = models.BooleanField(default=True)
     ship = models.ForeignKey(Type, related_name="involved_ship", null=True, default=None, on_delete=models.CASCADE)

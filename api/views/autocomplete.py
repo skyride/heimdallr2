@@ -40,21 +40,31 @@ def autocomplete_ship(request, name):
     }
     return _autocomplete(request, name, Type, "involved_ship", ["group__name"], extra_filters, min_length=0)
 
+def autocomplete_item(request, name):
+    extra_filters = {
+        "market_group__isnull": False,
+        "published": True
+    }
+    return _autocomplete(request, name, Type, extra_values=["group__name"], min_length=1)
 
-def _autocomplete(request, name, Model, order_key, extra_values=[], extra_filters={}, min_length=3):
+
+def _autocomplete(request, name, Model, order_key=None, extra_values=[], extra_filters={}, min_length=3):
     if len(name) >= min_length:
         out = Model.objects.filter(
             name__istartswith=name,
             **extra_filters
-        ).annotate(
-            order_key=Count(order_key)
-        ).order_by(
-            '-order_key'
         ).values(
             'id',
             'name',
             *extra_values
         )
+
+        if order_key != None:
+            out = out.annotate(
+                order_key=Count(order_key)
+            ).order_by(
+                '-order_key'
+            )
 
         return HttpResponse(ujson.dumps(list(out)), content_type="application/json")
     else:

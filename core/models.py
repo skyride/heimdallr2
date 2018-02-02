@@ -143,13 +143,8 @@ class Killmail(models.Model):
     date = models.DateTimeField(db_index=True)
     system = models.ForeignKey(System, related_name="kills", on_delete=models.CASCADE)
 
-    # Victim
-    character = models.ForeignKey(Character, related_name="losses", null=True, default=None, on_delete=models.SET_NULL)
-    corporation = models.ForeignKey(Corporation, related_name="losses", null=True, default=None, on_delete=models.SET_NULL)
-    alliance = models.ForeignKey(Alliance, null=True, related_name="losses", default=None, on_delete=models.SET_NULL)
-
     # Meta
-    ship = models.ForeignKey(Type, related_name="attackers_ship", null=True, default=None, on_delete=models.CASCADE)
+    ship = models.ForeignKey(Type, related_name="losses_ship", null=True, default=None, on_delete=models.CASCADE)
 
     value = models.DecimalField(max_digits=20, decimal_places=2, db_index=True)
     damage = models.IntegerField(db_index=True)
@@ -161,16 +156,17 @@ class Killmail(models.Model):
     added = models.DateTimeField(auto_now_add=True)
 
 
-# Instance of an attacker on a killmail
-class Attacker(models.Model):
+# People involved with the killmail
+class Involved(models.Model):
     kill = models.ForeignKey(Killmail, related_name="attackers", on_delete=models.CASCADE)
 
     character = models.ForeignKey(Character, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
     corporation = models.ForeignKey(Corporation, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
-    alliance = models.ForeignKey(Alliance, null=True, related_name="kills", default=None, on_delete=models.SET_NULL)
+    alliance = models.ForeignKey(Alliance, related_name="kills", null=True, default=None, on_delete=models.SET_NULL)
 
-    ship = models.ForeignKey(Type, related_name="victim_ship", null=True, default=None, on_delete=models.CASCADE)
-    weapon = models.ForeignKey(Type, null=True, related_name="victim_weapon", default=None, on_delete=models.CASCADE)
+    attacker = models.BooleanField(default=True)
+    ship = models.ForeignKey(Type, related_name="involved_ship", null=True, default=None, on_delete=models.CASCADE)
+    weapon = models.ForeignKey(Type, related_name="involved_weapon", null=True, default=None, on_delete=models.CASCADE)
     final_blow = models.BooleanField(default=False)
 
     damage = models.IntegerField(db_index=True)

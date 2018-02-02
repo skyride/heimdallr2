@@ -36,7 +36,8 @@ INSTALLED_APPS = [
 
     'sde',
 
-    'core'
+    'core',
+    'api',
 ]
 
 MIDDLEWARE = [

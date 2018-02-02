@@ -24,10 +24,10 @@ def autocomplete_alliance(request, name):
 
 # Map Entities
 def autocomplete_system(request, name):
-    return _autocomplete(request, name, System, "kills", ["region__name"])
+    return _autocomplete(request, name, System, "kills", ["region__name"], min_length=0)
 
 def autocomplete_constellation(request, name):
-    return _autocomplete(request, name, Constellation, "systems__kills", ["region__name"])
+    return _autocomplete(request, name, Constellation, "systems__kills", ["region__name"], min_length=0)
 
 def autocomplete_region(request, name):
     return _autocomplete(request, name, Region, "systems__kills", min_length=0)
@@ -38,7 +38,7 @@ def autocomplete_ship(request, name):
         "group__category_id__in": [6, 65],
         "published": True
     }
-    return _autocomplete(request, name, Type, "involved_ship", ["group__name"], extra_filters)
+    return _autocomplete(request, name, Type, "involved_ship", ["group__name"], extra_filters, min_length=0)
 
 
 def _autocomplete(request, name, Model, order_key, extra_values=[], extra_filters={}, min_length=3):

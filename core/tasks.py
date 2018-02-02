@@ -160,7 +160,7 @@ def parse_redisq(json):
     Item.objects.bulk_create(items)
 
     print(
-        "Added Kill ID %s with %s attackers from Redisq" % (
+        "Added Kill ID %s with %s involved from Redisq" % (
             km.id,
             len(attackers)
         )
@@ -254,7 +254,7 @@ def parse_zkill_api(json):
     Item.objects.bulk_create(items)
 
     print(
-        "Added Kill ID %s on %s with %s attackers from zkill API" % (
+        "Added Kill ID %s on %s with %s involved from zkill API" % (
             km.id,
             km.date.strftime("%d/%m/%Y %H:%M"),
             len(attackers)
@@ -349,7 +349,7 @@ def parse_crest(json, keyhash=None):
     Item.objects.bulk_create(items)
 
     print(
-        "Added Kill ID %s on %s with %s attackers from CREST" % (
+        "Added Kill ID %s on %s with %s involved from CREST" % (
             km.id,
             km.date.strftime("%d/%m/%Y %H:%M"),
             len(attackers)

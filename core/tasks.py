@@ -160,8 +160,9 @@ def parse_redisq(json):
     Item.objects.bulk_create(items)
 
     print(
-        "Added Kill ID %s with %s involved from Redisq" % (
+        "Added Kill ID %s on %s with %s involved from Redisq" % (
             km.id,
+            km.date.strftime("%d/%m/%Y %H:%M"),
             len(attackers)
         )
     )

@@ -109,7 +109,7 @@ ESI_BASE = "https://esi.tech.ccp.is"
 
 
 # Celery
-# Celery
+from kombu import Exchange, Queue
 CELERY_IGNORE_RESULT = False
 CELERY_TASK_RESULT_EXPIRES = 1200
 
@@ -119,6 +119,20 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
 BROKER_URL = "redis://127.0.0.1:6379/1"
+CELERY_QUEUES = (
+    Queue('control', Exchange('control'), routing_key='control'),
+    Queue('high', Exchange('high'), routing_key='high'),
+    Queue('low', Exchange('low'), routing_key='low'),
+)
+
+from datetime import timedelta
+CELERYBEAT_SCHEDULE = {
+    'spawn_price_updates': {
+        'task': 'spawn_price_updates',
+        'schedule': timedelta(hours=24),
+        'queue': 'control'
+    }
+}
 
 
 # Local Settings

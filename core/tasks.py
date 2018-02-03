@@ -16,21 +16,21 @@ from sde.models import System, Type
 
 
 
-@app.task(name="fetch_character_kills")
+@app.task(name="fetch_character_kills", queue="control")
 def fetch_character_kills(id):
     char = Character.get_or_create(id)
     url = "https://zkillboard.com/api/characterID/%s/page/%s/"
     _fetch_kills(char, url)
 
 
-@app.task(name="fetch_corporation_kills")
+@app.task(name="fetch_corporation_kills", queue="control")
 def fetch_corporation_kills(id):
     corp = Corporation.get_or_create(id)
     url = "https://zkillboard.com/api/corporationID/%s/page/%s/"
     _fetch_kills(corp, url)
 
 
-@app.task(name="fetch_alliance_kills")
+@app.task(name="fetch_alliance_kills", queue="control")
 def fetch_alliance_kills(id):
     alliance = Alliance.get_or_create(id)
     url = "https://zkillboard.com/api/allianceID/%s/page/%s/"
@@ -74,7 +74,7 @@ def _fetch_kills(obj, url):
     )
 
 
-@app.task(name="parse_redisq")
+@app.task(name="parse_redisq", queue="high")
 def parse_redisq(json):
     package = ujson.loads(json)['package']
     killmail = package['killmail']
@@ -167,7 +167,7 @@ def parse_redisq(json):
     )
 
 
-@app.task(name="parse_zkill_api")
+@app.task(name="parse_zkill_api", queue="low")
 def parse_zkill_api(json):
     package = ujson.loads(json)
     victim = package['victim']
@@ -262,7 +262,7 @@ def parse_zkill_api(json):
     )
 
 
-@app.task(name="parse_crest")
+@app.task(name="parse_crest", queue="low")
 def parse_crest(json, keyhash=None):
     if keyhash == None:
         package = ujson.loads(json)
@@ -357,7 +357,7 @@ def parse_crest(json, keyhash=None):
     )
 
 
-@app.task(name="spawn_price_updates")
+@app.task(name="spawn_price_updates", queue="control")
 def spawn_price_updates(inline=False):
     def chunks(l, n):
         for i in range(0, len(l), n):
@@ -384,7 +384,7 @@ def spawn_price_updates(inline=False):
     print("Queued price updates")
 
 
-@app.task(name="update_prices")
+@app.task(name="update_prices", queue="high")
 def update_prices(item_ids):
     r = requests.get(
         "https://market.fuzzwork.co.uk/aggregates/",

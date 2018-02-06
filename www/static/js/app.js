@@ -514,36 +514,36 @@ heimdallrApp.controller('KillsController', function KillsController($scope, $htt
 
   $scope.victimIcon = function(k) {
     // Check if we have an alliance, otherwise just use the corporation
-    if("alliance" in k.killmail.victim) {
-      return "https://imageserver.eveonline.com/Alliance/"+k.killmail.victim.alliance.id+"_64.png";
+    if("alliance_id" in k) {
+      return "https://imageserver.eveonline.com/Alliance/"+k.victim.alliance_id+"_64.png";
     } else {
-      return "https://imageserver.eveonline.com/Corporation/"+k.killmail.victim.corporation.id+"_64.png";
+      return "https://imageserver.eveonline.com/Corporation/"+k.victim.corporation_id+"_64.png";
     }
   };
 
   $scope.victimName = function(k) {
     // Check if we have a character, otherwise just the corporation
-    if("character" in k.killmail.victim) {
-      return k.killmail.victim.character.name;
+    if("character_id" in k.victim) {
+      return k.victim.character_name;
     } else {
-      return k.killmail.victim.corporation.name;
+      return k.victim.corporation_name;
     }
   };
 
   $scope.victimGuild = function(k) {
-    r = k.killmail.victim.corporation.name;
-    if("alliance" in k.killmail.victim) {
-      r = r + " / " + k.killmail.victim.alliance.name;
+    r = k.victim.corporation_name;
+    if("alliance_id" in k.victim) {
+      r = r + " / " + k.victim.alliance_name;
     }
     return r;
   };
 
   $scope.finalBlowIcon = function(k) {
     // Check if we have an alliance otherwise, just use the corporation
-    if("alliance" in k.killmail.finalBlow) {
-      return "https://imageserver.eveonline.com/Alliance/"+k.killmail.finalBlow.alliance.id+"_64.png";
+    if("alliance_id" in k.final_blow) {
+      return "https://imageserver.eveonline.com/Alliance/"+k.final_blow.alliance_id+"_64.png";
     } else if("corporation" in k.killmail.finalBlow) {
-      return "https://imageserver.eveonline.com/Corporation/"+k.killmail.finalBlow.corporation.id+"_64.png";
+      return "https://imageserver.eveonline.com/Corporation/"+k.final_blow.corporation_id+"_64.png";
     } else {
       return "/static/img/eve-question.png"
     }
@@ -551,10 +551,10 @@ heimdallrApp.controller('KillsController', function KillsController($scope, $htt
 
   $scope.finalBlowName = function(k) {
     // Check if we have a character, otherwise just the corporation
-    if("character" in k.killmail.finalBlow) {
-      return k.killmail.finalBlow.character.name;
-    } else if("corporation" in k.killmail.finalBlow) {
-      return k.killmail.finalBlow.corporation.name;
+    if("character_id" in k.final_blow) {
+      return k.final_blow.character_name;
+    } else if("corporation" in k.final_blow) {
+      return k.final_blow.character_name;
     } else {
       return "?"
     }
@@ -562,11 +562,11 @@ heimdallrApp.controller('KillsController', function KillsController($scope, $htt
 
   $scope.finalBlowGuild = function(k) {
     r = ""
-    if("corporation" in k.killmail.finalBlow) {
-      r = r + k.killmail.finalBlow.corporation.name;
+    if("corporation" in k.final_blow) {
+      r = r + k.final_blow.corporation_name;
     }
-    if("alliance" in k.killmail.finalBlow) {
-      r = r + " / " + k.killmail.finalBlow.alliance.name;
+    if("alliance" in k.final_blow) {
+      r = r + " / " + k.final_blow.alliance_name;
     }
     if(r == "") {
       r = "?"

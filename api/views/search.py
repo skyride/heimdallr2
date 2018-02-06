@@ -31,7 +31,11 @@ def search(request, data):
         involved_count=Count('involved')
     ).order_by(
         '-date'
-    )[:10]
+    ).prefetch_related(
+        'ship',
+        'system',
+        'system__region'
+    )[:50]
 
     return HttpResponse(generate_json(kms), content_type="application/json")
 
@@ -53,8 +57,68 @@ def generate_json(kms):
             "region_id": km.system.region_id,
             "region_name": km.system.region.name,
             "attackers": km.involved_count - 1,
-            
         }
+
+        final_blow = km.involved.filter(final_blow=True).values(
+            'character_id',
+            'character__name',
+            'corporation_id',
+            'corporation__name',
+            'alliance_id',
+            'alliance__name'
+        ).first()
+        if final_blow != None:
+            final_blow_out = {}
+
+            if "corporation_id" in final_blow:
+                final_blow_out.update({
+                    "corporation_id": final_blow['corporation_id'],
+                    "corporation_name": final_blow['corporation__name']
+                })
+            if "alliance_id" in final_blow:
+                final_blow_out.update({
+                    "alliance_id": final_blow['alliance_id'],
+                    "alliance_name": final_blow['alliance__name']
+                })
+            if "character_id" in final_blow:
+                final_blow_out.update({
+                    "character_id": final_blow['character_id'],
+                    "character_name": final_blow['character__name']
+                })
+            o.update({
+                "final_blow": final_blow_out
+            })
+
+        victim = km.involved.filter(attacker=False).values(
+            'character_id',
+            'character__name',
+            'corporation_id',
+            'corporation__name',
+            'alliance_id',
+            'alliance__name'
+        ).first()
+        if victim != None:
+            victim_out = {}
+
+            if "corporation_id" in victim:
+                victim_out.update({
+                    "corporation_id": victim['corporation_id'],
+                    "corporation_name": victim['corporation__name']
+                })
+            if "alliance_id" in victim:
+                victim_out.update({
+                    "alliance_id": victim['alliance_id'],
+                    "alliance_name": victim['alliance__name']
+                })
+            if "character_id" in victim:
+                victim_out.update({
+                    "character_id": victim['character_id'],
+                    "character_name": victim['character__name']
+                })
+            o.update({
+                "victim": victim_out
+            })
+
         out.append(o)
 
     return ujson.dumps(out)

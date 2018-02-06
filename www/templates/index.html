@@ -446,10 +446,10 @@
                       <ul class="filter-list" ng-click="$event.stopPropagation()">
                         <li ng-click="removeSystem(item)" ng-repeat="item in params.solarSystem">
                           <span class="text-primary">
-                            <img class="dropdown-icon" ng-src="https://image.eveonline.com/Type/{{item.sunTypeID}}_32.png" />
+                            <img class="dropdown-icon" ng-src="https://image.eveonline.com/Type/{{item.sun_id}}_32.png" />
                             {{item.name}}
                             <span class="pull-right">
-                              {{item.regionName}}
+                              {{item.region__name}}
                               (<span class="{{sysSecClass(item.security)}}">{{sysSecStatus(item.security)}}</span>)
                               <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             </span>
@@ -538,22 +538,22 @@
                 <td><div>
                   <p>
                     {{k.date | date:"HH:mm"}}<br />
-                    <a href="https://zkillboard.com/kill/{{k.killID}}/">{{iskFormat(k.zkb.totalValue)}}</a><br />
+                    <a href="https://zkillboard.com/kill/{{k.id}}/">{{iskFormat(k.value)}}</a><br />
                     {{k.date | date:"dd/MM/yy" }}
                   </p>
                 </div></td>
 
                 <!-- Ship Icon -->
                 <td><div>
-                  <a href="https://zkillboard.com/kill/{{k.killID}}/"><img class="kill-img" ng-src="https://image.eveonline.com/Type/{{k.killmail.victim.shipType.id}}_64.png"></a>
+                  <a href="https://zkillboard.com/kill/{{k.id}}/"><img class="kill-img" ng-src="https://image.eveonline.com/Type/{{k.ship_id}}_64.png"></a>
                 </div></td>
 
                 <!-- System and Region info -->
                 <td><div>
                   <p class="systemp">
-                    <a href="" ng-click="addSystem(getSystem(k.killmail.solarSystem.id))">{{k.killmail.solarSystem.name}}</a>
-                    <span class="{{sysSecClass(k.killmail.solarSystem.securityStatus)}}">{{sysSecStatus(k.killmail.solarSystem.securityStatus)}}</span><br />
-                    <a href="" ng-click="addRegion(getRegion(k.killmail.region.id))">{{k.killmail.region.name}}</a>
+                    <a href="" ng-click="addSystem(getSystem(k.system_id))">{{k.system_name}}</a>
+                    <span class="{{sysSecClass(k.system_sec)}}">{{sysSecStatus(k.system_sec)}}</span><br />
+                    <a href="" ng-click="addRegion(getRegion(k.region_id))">{{k.region_name}}</a>
                   </p>
                 </div></td>
 
@@ -569,12 +569,12 @@
                   <p>
                     <span class="hidden-xs">
                       <!--<a href="" ng-click="addVictim(k)">-->{{victimName(k)}}<!--</a>-->
-                      (<a href="" ng-click="addVictimShip(getShipType(k.killmail.victim.shipType.id))">{{k.killmail.victim.shipType.name}}</a>)
+                      (<a href="" ng-click="addVictimShip(getShipType(k.ship_id))">{{k.ship_name}}</a>)
                       <br />
                     </span>
                     {{victimGuild(k)}}
                     <span class="visible-xs">
-                      (<a href="" ng-click="addVictimShip(getShipType(k.killmail.victim.shipType.id))">{{k.killmail.victim.shipType.name}}</a>)
+                      (<a href="" ng-click="addVictimShip(getShipType(k.ship_id))">{{k.ship_name}}</a>)
                     </span>
                   </p>
                 </div></td>
@@ -589,8 +589,8 @@
                 <!-- Final Blow info -->
                 <td><div>
                   <p>
-                    <span class="hidden-xs">{{finalBlowName(k)}} ({{k.killmail.attackerCount}})<br /></span>
-                    {{finalBlowGuild(k)}} <span class="visible-xs">({{k.killmail.attackerCount}})</span>
+                    <span class="hidden-xs">{{finalBlowName(k)}} ({{k.attackers}})<br /></span>
+                    {{finalBlowGuild(k)}} <span class="visible-xs">({{k.attackers}})</span>
                   </p>
                 </div></td>
             </tr>

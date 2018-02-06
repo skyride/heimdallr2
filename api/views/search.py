@@ -5,7 +5,7 @@ from django.db.models import Q, Count
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
-from core.models import Killmail
+from core.models import Killmail, Involved
 
 
 def search(request, data):
@@ -26,15 +26,23 @@ def search(request, data):
         query.add(search, Q.AND)
 
     kms = Killmail.objects.filter(
-        query
+        Q(query)
     ).annotate(
         involved_count=Count('involved')
+    ).values(
+        'id',
+        'date',
+        'value',
+        'ship_id',
+        'ship__name',
+        'system_id',
+        'system__name',
+        'system__security',
+        'system__region_id',
+        'system__region__name',
+        'involved_count'
     ).order_by(
         '-date'
-    ).prefetch_related(
-        'ship',
-        'system',
-        'system__region'
     )[:50]
 
     return HttpResponse(generate_json(kms), content_type="application/json")
@@ -46,20 +54,20 @@ def generate_json(kms):
 
     for km in kms:
         o = {
-            "id": km.id,
-            "date": km.date.strftime("%Y-%m-%d %H:%m"),
-            "value": km.value,
-            "ship_id": km.ship_id,
-            "ship_name": km.ship.name,
-            "system_id": km.system_id,
-            "system_name": km.system.name,
-            "system_sec": km.system.security,
-            "region_id": km.system.region_id,
-            "region_name": km.system.region.name,
-            "attackers": km.involved_count - 1,
+            "id": km['id'],
+            "date": km['date'].strftime("%Y-%m-%d %H:%m"),
+            "value": km['value'],
+            "ship_id": km['ship_id'],
+            "ship_name": km['ship__name'],
+            "system_id": km['system_id'],
+            "system_name": km['system__name'],
+            "system_sec": km['system__security'],
+            "region_id": km['system__region_id'],
+            "region_name": km['system__region__name'],
+            "attackers": km['involved_count'] - 1,
         }
 
-        final_blow = km.involved.filter(final_blow=True).values(
+        final_blow = Involved.objects.filter(kill_id=km['id'], final_blow=True).values(
             'character_id',
             'character__name',
             'corporation_id',
@@ -89,7 +97,7 @@ def generate_json(kms):
                 "final_blow": final_blow_out
             })
 
-        victim = km.involved.filter(attacker=False).values(
+        victim = Involved.objects.filter(kill_id=km['id'], attacker=False).values(
             'character_id',
             'character__name',
             'corporation_id',

@@ -23,6 +23,7 @@ urlpatterns = [
     re_path(r'autocomplete/corporation/(.+)', views.autocomplete_corporation, name="autocomplete_corporation"),
     re_path(r'autocomplete/alliance/(.+)', views.autocomplete_alliance, name="autocomplete_alliance"),
     re_path(r'autocomplete/ships/(.*)', views.autocomplete_ship, name="autocomplete_ship"),
+    re_path(r'autocomplete/groups/(.*)', views.autocomplete_group, name="autocomplete_group"),
     re_path(r'autocomplete/item/(.*)', views.autocomplete_item, name="autocomplete_item"),
 
     re_path(r'map/systems/(.*)', views.autocomplete_system, name="autocomplete_system"),

@@ -98,7 +98,7 @@ class Category(models.Model):
 class Group(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100, db_index=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name="groups", on_delete=models.CASCADE)
     icon_id = models.IntegerField(null=True)
     anchored = models.BooleanField()
     anchorable = models.BooleanField()
@@ -111,7 +111,7 @@ class Group(models.Model):
 
 class Type(models.Model):
     id = models.IntegerField(primary_key=True)
-    group = models.ForeignKey(Group, null=True, default=None, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, related_name="types", null=True, default=None, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, db_index=True)
     description = models.TextField()
     mass = models.FloatField(null=True)

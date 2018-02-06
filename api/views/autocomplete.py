@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 
 from core.models import Character, Corporation, Alliance, Killmail
-from sde.models import System, Constellation, Region, Type
+from sde.models import System, Constellation, Region, Type, Group
 
 TOO_SHORT_ERROR = {
     "error": "TOO_SHORT",
@@ -45,7 +45,13 @@ def autocomplete_ship(request, name):
         "group__category_id__in": [6, 65],
         "published": True
     }
-    return _autocomplete(request, name, Type, "involved_ship", ["group__name"], extra_filters, min_length=0)
+    return _autocomplete(request, name, Type, order_key="involved_ship", extra_filters=extra_filters, min_length=0)
+
+def autocomplete_group(request, name):
+    extra_filters = {
+        "category_id__in": [6, 65]
+    }
+    return _autocomplete(request, name, Group, extra_filters=extra_filters, min_length=0)
 
 def autocomplete_item(request, name):
     extra_filters = {

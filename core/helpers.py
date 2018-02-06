@@ -4,7 +4,7 @@ from django.utils.timezone import make_aware
 
 
 def parse_crest_date(text):
-    date, time = "2007.12.05 22:39:00".split(" ")
+    date, time = text.split(" ")
     years, months, days = date.split(".")
     hours, minutes, seconds = time.split(":")
 

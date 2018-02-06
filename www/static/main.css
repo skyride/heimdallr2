@@ -1,0 +1,127 @@
+.kill-container {
+  width: 100%;
+  padding: 0;
+}
+
+/* Filter */
+.dropdown-icon {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+.location-icon {
+  border-radius: 3px;
+  float: left;
+  width: 24px;
+  height: 24px;
+}
+
+.typeahead-left-icon {
+  padding-left: 5px !important;
+}
+
+.dropdown-menu input.form-control {
+  min-width: 250px;
+}
+
+.filter-list img {
+  width: 24px;
+  height: 24px;
+}
+
+ul.filter-list {
+  padding: 3px 20px;
+  list-style-type: none;
+
+}
+
+ul.filter-list li {
+  margin-top: 2px;
+  padding: 6px;
+  border-radius: 4px;
+  background-color: #eee;
+  width: 100%;
+}
+ul.filter-list li {
+  line-height: 24px;
+  cursor: pointer;
+}
+ul.filter-list li:hover {
+  text-decoration: none;
+}
+
+ul.filter-list li span.glyphicon {
+  margin-left: 2px;
+  margin-top: -5px;
+  vertical-align: middle;
+}
+
+.typeahead-sec {
+  float: left;
+  width: 24px;
+  text-align: right;
+  margin-right: 5px;
+}
+
+/* Kills */
+tr.ng-enter {
+    opacity: 0;
+    transition: all 0.8s ease;
+}
+tr.ng-enter-active {
+    opacity: 1;
+}
+
+tr.ng-enter td div {
+  max-height: 0px;
+  -webkit-transition: 800ms cubic-bezier(0.250, 0.100, 0.250, 1.000) all;
+  -moz-transition: 800ms cubic-bezier(0.250, 0.100, 0.250, 1.000) all;
+  -ms-transition: 800ms cubic-bezier(0.250, 0.100, 0.250, 1.000) all;
+  -o-transition: 800ms cubic-bezier(0.250, 0.100, 0.250, 1.000) all;
+  transition: 800ms cubic-bezier(0.250, 0.100, 0.250, 1.000) all;
+}
+tr.ng-enter-active td div {
+  max-height: 150px;
+}
+
+
+table.kill-container tbody tr td.lefttd {
+  padding: 0;
+}
+
+.leftblock {
+  margin-top: 1px;
+  height: 66px;
+  width: 4px;
+  background-color: #2c3e50;
+}
+
+table.kill-container tbody tr td {
+  padding: 2px;
+}
+
+.kill td p {
+  margin-left: 8px;
+  margin-bottom: 0px;
+}
+
+.systemp {
+  /*min-width: 110px;*/
+}
+
+.kill-img {
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+.sec-1-0 { color: #2FEFEF; }
+.sec-0-9 { color: #48F0C0; }
+.sec-0-8 { color: #00EF47; }
+.sec-0-7 { color: #00F000; }
+.sec-0-6 { color: #8FEF2F; }
+.sec-0-5 { color: #EFEF00; }
+.sec-0-4 { color: #D77700; }
+.sec-0-3 { color: #F06000; }
+.sec-0-2 { color: #F04800; }
+.sec-0-1 { color: #D73000; }
+.sec-0-0 { color: #F00000; }

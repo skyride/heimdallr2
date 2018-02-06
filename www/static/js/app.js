@@ -111,13 +111,13 @@ heimdallrApp.controller('KillsController', function KillsController($scope, $htt
       for(var i = 0; i < response.data.length; i++) {
         found = false;
         for(var ii = 0; ii < $scope.kms.length; ii++) {
-          if(response.data[i].killID == $scope.kms[ii].killID) {
+          if(response.data[i].id == $scope.kms[ii].id) {
             found = true;
           }
         }
         if(found === false) {
           // Push the new object on to the km queue
-          response.data[i].killmail.killTime = Date.parse(response.data[i].killmail.killTime);
+          response.data[i].date = Date.parse(response.data[i].date);
           $scope.kms.push(response.data[i]);
 
           // If it's getting too large let's cull an object to avoid memory leaks

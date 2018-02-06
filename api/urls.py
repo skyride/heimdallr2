@@ -29,4 +29,7 @@ urlpatterns = [
     re_path(r'map/systems/(.*)', views.autocomplete_system, name="autocomplete_system"),
     re_path(r'map/constellations/(.*)', views.autocomplete_constellation, name="autocomplete_constellation"),
     re_path(r'map/regions/(.*)', views.autocomplete_region, name="autocomplete_region"),
+
+    # Search
+    re_path(r'search/(.+)', views.search, name="search")
 ]

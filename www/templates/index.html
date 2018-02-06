@@ -530,16 +530,16 @@
       <!-- Results -->
       <div class="row">
         <table class="table table-striped kill-container">
-            <tr class="kill" ng-repeat="k in kms | orderBy: '-killmail.killTime' | limitTo: 50">
+            <tr class="kill" ng-repeat="k in kms | orderBy: '-date' | limitTo: 50">
                 <!-- Left Block-->
                 <td class="lefttd"><div class="leftblock"></div></td>
 
                 <!-- Time, date and value -->
                 <td><div>
                   <p>
-                    {{k.killmail.killTime | date:"HH:mm"}}<br />
+                    {{k.date | date:"HH:mm"}}<br />
                     <a href="https://zkillboard.com/kill/{{k.killID}}/">{{iskFormat(k.zkb.totalValue)}}</a><br />
-                    {{k.killmail.killTime | date:"dd/MM/yy" }}
+                    {{k.date | date:"dd/MM/yy" }}
                   </p>
                 </div></td>
 

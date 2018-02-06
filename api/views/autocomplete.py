@@ -24,7 +24,14 @@ def autocomplete_alliance(request, name):
 
 # Map Entities
 def autocomplete_system(request, name):
-    return _autocomplete(request, name, System, "kills", ["region__name"], min_length=0)
+    extra_values =  [
+        "region__name",
+        "constellation__name",
+        "sun_id",
+        "security"
+    ]
+
+    return _autocomplete(request, name, System, "kills", extra_values, min_length=0)
 
 def autocomplete_constellation(request, name):
     return _autocomplete(request, name, Constellation, "systems__kills", ["region__name"], min_length=0)

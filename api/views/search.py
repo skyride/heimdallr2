@@ -33,7 +33,7 @@ def search(request, data):
         'system__region'
     ).order_by(
         '-date'
-    )
+    )[:50]
 
     return HttpResponse(generate_json(kms), content_type="application/json")
 
@@ -42,7 +42,7 @@ def search(request, data):
 def generate_json(kms):
     out = []
 
-    for km in kms[:50]:
+    for km in kms:
         o = {
             "id": km.id,
             "date": km.date.strftime("%Y-%m-%d %H:%m"),
@@ -56,7 +56,7 @@ def generate_json(kms):
             "region_name": km.system.region.name,
             "attackers": 1,
         }
-        print(km.id, "kill")
+        print(o['date'])
 
         final_blow = Involved.objects.filter(kill_id=km.id, final_blow=True).values(
             'character_id',
@@ -87,7 +87,6 @@ def generate_json(kms):
             o.update({
                 "final_blow": final_blow_out
             })
-        print(km.id, "final blow")
 
         victim = Involved.objects.filter(kill_id=km.id, attacker=False).values(
             'character_id',
@@ -118,7 +117,6 @@ def generate_json(kms):
             o.update({
                 "victim": victim_out
             })
-        print(km.id, "victim")
 
         out.append(o)
 

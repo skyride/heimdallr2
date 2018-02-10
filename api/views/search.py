@@ -45,7 +45,7 @@ def generate_json(kms):
     for km in kms:
         o = {
             "id": km.id,
-            "date": km.date.strftime("%Y-%M-%d %H:%m"),
+            "date": km.date.strftime("%Y-%m-%d %H:%M"),
             "value": km.value,
             "ship_id": km.ship_id,
             "ship_name": km.ship.name,

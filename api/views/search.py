@@ -31,17 +31,6 @@ def search(request, data):
         'ship',
         'system',
         'system__region'
-    ).values(
-        'id',
-        'date',
-        'value',
-        'ship_id',
-        'ship__name',
-        'system_id',
-        'system__name',
-        'system__security',
-        'system__region_id',
-        'system__region__name'
     ).order_by(
         '-date'
     )
@@ -55,16 +44,16 @@ def generate_json(kms):
 
     for km in kms[:50]:
         o = {
-            "id": km['id'],
-            "date": km['date'].strftime("%Y-%m-%d %H:%m"),
-            "value": km['value'],
-            "ship_id": km['ship_id'],
-            "ship_name": km['ship__name'],
-            "system_id": km['system_id'],
-            "system_name": km['system__name'],
-            "system_sec": km['system__security'],
-            "region_id": km['system__region_id'],
-            "region_name": km['system__region__name'],
+            "id": km.id,
+            "date": km.id.strftime("%Y-%m-%d %H:%m"),
+            "value": km.value,
+            "ship_id": km.ship_id,
+            "ship_name": km.ship.name,
+            "system_id": km.system_id,
+            "system_name": km.system.name,
+            "system_sec": km.system.security,
+            "region_id": km.system.region_id,
+            "region_name": km.system.region.name,
             "attackers": 1,
         }
 

@@ -56,6 +56,7 @@ def generate_json(kms):
             "region_name": km.system.region.name,
             "attackers": 1,
         }
+        print(km.id, "kill")
 
         final_blow = Involved.objects.filter(kill_id=km['id'], final_blow=True).values(
             'character_id',
@@ -86,6 +87,7 @@ def generate_json(kms):
             o.update({
                 "final_blow": final_blow_out
             })
+        print(km.id, "final blow")
 
         victim = Involved.objects.filter(kill_id=km['id'], attacker=False).values(
             'character_id',
@@ -116,6 +118,7 @@ def generate_json(kms):
             o.update({
                 "victim": victim_out
             })
+        print(km.id, "victim")
 
         out.append(o)
 

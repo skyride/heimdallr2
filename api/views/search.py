@@ -89,7 +89,7 @@ def generate_json(kms):
             })
         print(km.id, "final blow")
 
-        victim = Involved.objects.filter(kill_id=km['id'], attacker=False).values(
+        victim = Involved.objects.filter(kill_id=km.id, attacker=False).values(
             'character_id',
             'character__name',
             'corporation_id',

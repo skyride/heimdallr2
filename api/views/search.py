@@ -27,6 +27,10 @@ def search(request, data):
 
     kms = Killmail.objects.filter(
         Q(query)
+    ).prefetch_related(
+        'ship',
+        'system',
+        'system__region'
     ).values(
         'id',
         'date',
@@ -40,7 +44,7 @@ def search(request, data):
         'system__region__name'
     ).order_by(
         '-date'
-    )[:50]
+    )
 
     return HttpResponse(generate_json(kms), content_type="application/json")
 
@@ -49,7 +53,7 @@ def search(request, data):
 def generate_json(kms):
     out = []
 
-    for km in kms:
+    for km in kms[:50]:
         o = {
             "id": km['id'],
             "date": km['date'].strftime("%Y-%m-%d %H:%m"),

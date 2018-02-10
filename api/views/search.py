@@ -58,7 +58,7 @@ def generate_json(kms):
         }
         print(km.id, "kill")
 
-        final_blow = Involved.objects.filter(kill_id=km['id'], final_blow=True).values(
+        final_blow = Involved.objects.filter(kill_id=km.id, final_blow=True).values(
             'character_id',
             'character__name',
             'corporation_id',

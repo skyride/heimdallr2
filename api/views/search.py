@@ -13,6 +13,7 @@ def search(request, data):
     
     # Build query
     query = Q()
+    print(data)
 
     # Victim
     if ("victimCharacter" or "victimCorporation" or "victimAlliance") in data:
@@ -24,6 +25,7 @@ def search(request, data):
         if "victimAlliance" in data:
             search.add(Q(involved__character_id__in=data['victimAlliance']), Q.OR)
         query.add(search, Q.AND)
+    print(query)
 
     kms = Killmail.objects.filter(
         Q(query)
@@ -56,7 +58,6 @@ def generate_json(kms):
             "region_name": km.system.region.name,
             "attackers": 1,
         }
-        print(o['id'], km.date)
 
         final_blow = Involved.objects.filter(kill_id=km.id, final_blow=True).values(
             'character_id',

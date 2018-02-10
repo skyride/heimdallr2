@@ -27,8 +27,6 @@ def search(request, data):
 
     kms = Killmail.objects.filter(
         Q(query)
-    ).annotate(
-        involved_count=Count('involved')
     ).values(
         'id',
         'date',
@@ -39,8 +37,7 @@ def search(request, data):
         'system__name',
         'system__security',
         'system__region_id',
-        'system__region__name',
-        'involved_count'
+        'system__region__name'
     ).order_by(
         '-date'
     )[:50]
@@ -64,7 +61,7 @@ def generate_json(kms):
             "system_sec": km['system__security'],
             "region_id": km['system__region_id'],
             "region_name": km['system__region__name'],
-            "attackers": km['involved_count'] - 1,
+            "attackers": 1,
         }
 
         final_blow = Involved.objects.filter(kill_id=km['id'], final_blow=True).values(

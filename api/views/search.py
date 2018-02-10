@@ -56,7 +56,7 @@ def generate_json(kms):
             "region_name": km.system.region.name,
             "attackers": 1,
         }
-        print(o['id'], o['date'])
+        print(o['id'], km.date)
 
         final_blow = Involved.objects.filter(kill_id=km.id, final_blow=True).values(
             'character_id',

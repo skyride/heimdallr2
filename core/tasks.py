@@ -263,6 +263,106 @@ def parse_zkill_api(json):
     )
 
 
+@app.task(name="parse_esi", queue="low")
+def parse_esi(json=None, keyhash=None):
+    if json != None:
+        package = ujson.loads(json)
+        victim = package['victim']
+        if Killmail.objects.filter(id=package['killmail_id']).count() > 0:
+            print("Kill ID %s already exists" % package['killmail_id'])
+            return
+    else:
+        if Killmail.objects.filter(id=keyhash[0]).count() > 0:
+            print("Kill ID %s already exists" % keyhash[0])
+            return
+
+        package = requests.get("https://esi.tech.ccp.is/latest/killmails/%s/%s/" % (keyhash[0], keyhash[1])).json()
+        victim = package['victim']
+
+    # Populate killmail
+    km = Killmail(
+        id=package['killmail_id'],
+        source_id=3,
+        date=parse_datetime(package['killmail_time']),
+        system_id=package['solar_system_id'],
+        ship_id=victim['ship_type_id'],
+        value=0,
+        damage=victim['damage_taken']
+    )
+
+    if "position" in victim:
+        if "x" in victim['position']:
+            km.x = victim['position']['x']
+            km.y = victim['position']['y']
+            km.z = victim['position']['z']
+
+    db_victim = Involved(
+        kill=km,
+        attacker=False,
+        ship_id=victim['ship_type_id'],
+        damage=0
+    )
+    if "character_id" in victim:
+        db_victim.character = Character.get_or_create(victim['character_id'])
+    if "corporation_id" in victim:
+        db_victim.corporation = Corporation.get_or_create(victim['corporation_id'])
+    if "alliance_id" in victim:
+        db_victim.alliance = Alliance.get_or_create(victim['alliance_id'])
+
+    km.save()
+
+    # Populate attackers
+    attackers = [db_victim]
+    for attacker in package['attackers']:
+        a = Involved(
+            kill=km,
+            damage=attacker['damage_done']
+        )
+
+        if "final_blow" in attacker:
+            a.final_blow = attacker['final_blow']
+        if "character_id" in attacker:
+            a.character = Character.get_or_create(attacker['character_id'])
+        if "corporation_id" in attacker:
+            a.corporation = Corporation.get_or_create(attacker['corporation_id'])
+        if "alliance_id" in attacker:
+            a.alliance = Alliance.get_or_create(attacker['alliance_id'])
+
+        if "ship_type_id" in attacker:
+            a.ship_id = attacker['ship_type_id']
+        if "weapon_type_id" in attacker:
+            a.weapon_id = attacker['weapon_type_id']
+        #a.save()
+        attackers.append(a)
+    Involved.objects.bulk_create(attackers)
+
+    # Populate Items
+    items = []
+    for item in victim['items']:
+        i = Item(
+            kill=km,
+            type_id=item['item_type_id'],
+            singleton=item['singleton'],
+            flag=item['flag']
+        )
+
+        if "quantity_dropped" in item:
+            i.quantity = item['quantity_dropped']
+        if "quantity_destroyed" in item:
+            i.quantity = item['quantity_destroyed']
+        #i.save()
+        items.append(i)
+    Item.objects.bulk_create(items)
+
+    print(
+        "Added Kill ID %s on %s with %s involved from zkill API" % (
+            km.id,
+            km.date.strftime("%d/%m/%Y %H:%M"),
+            len(attackers)
+        )
+    )
+
+
 @app.task(name="parse_crest", queue="low")
 def parse_crest(json, keyhash=None):
     if keyhash == None:

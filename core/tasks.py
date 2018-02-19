@@ -355,7 +355,7 @@ def parse_esi(json=None, keyhash=None):
     Item.objects.bulk_create(items)
 
     print(
-        "Added Kill ID %s on %s with %s involved from zkill API" % (
+        "Added Kill ID %s on %s with %s involved from ESI" % (
             km.id,
             km.date.strftime("%d/%m/%Y %H:%M"),
             len(attackers)

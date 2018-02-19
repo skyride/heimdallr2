@@ -3,3 +3,4 @@
 *.sqlite3
 local_settings.py
 .vscode
+.ropeproject

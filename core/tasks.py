@@ -403,7 +403,7 @@ def parse_esi(json=None, keyhash=None, attempts=0, source_id=3):
         ).aggregate(
             total_value=Sum('value')
         )['total_value'] + float(km.ship.sell)
-        if km.value == None:
+        if km.value != None:
             km.value = float(km.ship.sell)
         else:
             km.value = km.value + float(km.ship.sell)

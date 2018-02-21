@@ -148,7 +148,7 @@ class Killmail(models.Model):
 
     value = models.DecimalField(max_digits=20, decimal_places=2, db_index=True)
     damage = models.IntegerField(db_index=True)
-    involved_count = models.IntegerField(db_index=True)
+    attackers = models.IntegerField(default=0, db_index=True)
 
     x = models.FloatField(null=True, default=None)
     y = models.FloatField(null=True, default=None)

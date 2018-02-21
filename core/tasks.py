@@ -5,6 +5,7 @@ import ujson
 import requests
 
 from django.db import transaction
+from django.db.models import ExpressionWrapper, Sum, F, FloatField
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import make_aware
 
@@ -324,7 +325,8 @@ def parse_esi(json=None, keyhash=None, attempts=0):
             system_id=package['solar_system_id'],
             ship_id=victim['ship_type_id'],
             value=0,
-            damage=victim['damage_taken']
+            damage=victim['damage_taken'],
+            attackers=len(package['attackers'])
         )
 
         if "position" in victim:
@@ -390,6 +392,16 @@ def parse_esi(json=None, keyhash=None, attempts=0):
             #i.save()
             items.append(i)
         Item.objects.bulk_create(items)
+
+        # Calculate the cost of the ship
+        km.value = km.items.annotate(
+            value=ExpressionWrapper(
+                F('type__sell') * F('quantity'),
+                output_field=FloatField()
+            )
+        ).aggregate(
+            total_value=Sum('value')
+        )['total_value'] + float(km.ship.sell)
 
     print(
         "Added Kill ID %s on %s with %s involved from ESI" % (

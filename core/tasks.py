@@ -263,26 +263,31 @@ def parse_zkill_api(json):
     )
 
 
-@app.task(name="parse_crest", queue="low")
-def parse_crest(json, keyhash=None):
-    if keyhash == None:
+@app.task(name="parse_esi", queue="low")
+def parse_esi(json=None, keyhash=None):
+    if json != None:
         package = ujson.loads(json)
-        if Killmail.objects.filter(id=package['killID']).count() > 0:
-            print("Kill ID %s already exists" % package['killID'])
+        victim = package['victim']
+        if Killmail.objects.filter(id=package['killmail_id']).count() > 0:
+            print("Kill ID %s already exists" % package['killmail_id'])
             return
     else:
-        package = requests.get("https://crest-tq.eveonline.com/killmails/%s/%s/" % (keyhash[0], keyhash[1])).json()
-    victim = package['victim']
+        if Killmail.objects.filter(id=keyhash[0]).count() > 0:
+            print("Kill ID %s already exists" % keyhash[0])
+            return
+
+        package = requests.get("https://esi.tech.ccp.is/latest/killmails/%s/%s/" % (keyhash[0], keyhash[1])).json()
+        victim = package['victim']
 
     # Populate killmail
     km = Killmail(
-        id=package['killID'],
-        source_id=4,
-        date=parse_crest_date(package['killTime']),
-        system_id=package['solarSystem']['id'],
-        ship_id=victim['shipType']['id'],
+        id=package['killmail_id'],
+        source_id=3,
+        date=parse_datetime(package['killmail_time']),
+        system_id=package['solar_system_id'],
+        ship_id=victim['ship_type_id'],
         value=0,
-        damage=victim['damageTaken']
+        damage=victim['damage_taken']
     )
 
     if "position" in victim:
@@ -294,15 +299,15 @@ def parse_crest(json, keyhash=None):
     db_victim = Involved(
         kill=km,
         attacker=False,
-        ship_id=victim['shipType']['id'],
+        ship_id=victim['ship_type_id'],
         damage=0
     )
-    if "character" in victim:
-        db_victim.character = Character.get_or_create(victim['character']['id'])
-    if "corporation" in victim:
-        db_victim.corporation = Corporation.get_or_create(victim['corporation']['id'])
-    if "alliance" in victim:
-        db_victim.alliance = Alliance.get_or_create(victim['alliance']['id'])
+    if "character_id" in victim:
+        db_victim.character = Character.get_or_create(victim['character_id'])
+    if "corporation_id" in victim:
+        db_victim.corporation = Corporation.get_or_create(victim['corporation_id'])
+    if "alliance_id" in victim:
+        db_victim.alliance = Alliance.get_or_create(victim['alliance_id'])
 
     km.save()
 
@@ -311,22 +316,22 @@ def parse_crest(json, keyhash=None):
     for attacker in package['attackers']:
         a = Involved(
             kill=km,
-            damage=attacker['damageDone']
+            damage=attacker['damage_done']
         )
 
         if "final_blow" in attacker:
-            a.final_blow = attacker['finalBlow']
-        if "character" in attacker:
-            a.character = Character.get_or_create(attacker['character']['id'])
-        if "corporation" in attacker:
-            a.corporation = Corporation.get_or_create(attacker['corporation']['id'])
-        if "alliance" in attacker:
-            a.alliance = Alliance.get_or_create(attacker['alliance']['id'])
+            a.final_blow = attacker['final_blow']
+        if "character_id" in attacker:
+            a.character = Character.get_or_create(attacker['character_id'])
+        if "corporation_id" in attacker:
+            a.corporation = Corporation.get_or_create(attacker['corporation_id'])
+        if "alliance_id" in attacker:
+            a.alliance = Alliance.get_or_create(attacker['alliance_id'])
 
-        if "shipType" in attacker:
-            a.ship_id = attacker['shipType']['id']
-        if "weaponType" in attacker:
-            a.weapon_id = attacker['weaponType']['id']
+        if "ship_type_id" in attacker:
+            a.ship_id = attacker['ship_type_id']
+        if "weapon_type_id" in attacker:
+            a.weapon_id = attacker['weapon_type_id']
         #a.save()
         attackers.append(a)
     Involved.objects.bulk_create(attackers)
@@ -336,26 +341,31 @@ def parse_crest(json, keyhash=None):
     for item in victim['items']:
         i = Item(
             kill=km,
-            type_id=item['itemType']['id'],
+            type_id=item['item_type_id'],
             singleton=item['singleton'],
             flag=item['flag']
         )
 
-        if "quantityDropped" in item:
-            i.quantity = item['quantityDropped']
-        if "quantityDestroyed" in item:
-            i.quantity = item['quantityDestroyed']
+        if "quantity_dropped" in item:
+            i.quantity = item['quantity_dropped']
+        if "quantity_destroyed" in item:
+            i.quantity = item['quantity_destroyed']
         #i.save()
         items.append(i)
     Item.objects.bulk_create(items)
 
     print(
-        "Added Kill ID %s on %s with %s involved from CREST" % (
+        "Added Kill ID %s on %s with %s involved from ESI" % (
             km.id,
             km.date.strftime("%d/%m/%Y %H:%M"),
             len(attackers)
         )
     )
+
+
+@app.task(name="parse_crest", queue="low")
+def parse_crest(json, keyhash=None):
+    parse_esi(keyhash=keyhash)
 
 
 @app.task(name="spawn_price_updates", queue="control")

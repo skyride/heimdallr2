@@ -94,7 +94,8 @@ def parse_redisq(json):
         system_id=killmail['solar_system_id'],
         ship_id=victim['ship_type_id'],
         value=zkb['totalValue'],
-        damage=victim['damage_taken']
+        damage=victim['damage_taken'],
+        attackers=len(killmail['attackers'])
     )
 
     if "position" in victim:
@@ -264,7 +265,7 @@ def parse_zkill_api(json):
 
 
 @app.task(name="parse_esi", queue="low")
-def parse_esi(json=None, keyhash=None, attempts=0):
+def parse_esi(json=None, keyhash=None, attempts=0, source_id=3):
     if json != None:
         package = ujson.loads(json)
         victim = package['victim']
@@ -320,7 +321,7 @@ def parse_esi(json=None, keyhash=None, attempts=0):
     with transaction.atomic():
         km = Killmail(
             id=package['killmail_id'],
-            source_id=3,
+            source_id=source_id,
             date=parse_datetime(package['killmail_time']),
             system_id=package['solar_system_id'],
             ship_id=victim['ship_type_id'],

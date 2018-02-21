@@ -310,11 +310,11 @@ def parse_esi(json=None, keyhash=None, attempts=0, source_id=3):
             alliances.add(attacker['alliance_id'])
 
     # Now call get_or_create to preload them in the database
-    for char in chars:
+    for char in chars - set(Character.objects.filter(id__in=chars).values_list('id', flat=True)):
         Character.get_or_create(char)
-    for corp in corps:
+    for corp in corps - set(Corporation.objects.filter(id__in=corps).values_list('id', flat=True)):
         Corporation.get_or_create(corp)
-    for alliance in alliances:
+    for alliance in alliances - set(Alliance.objects.filter(id__in=alliances).values_list('id', flat=True)):
         Alliance.get_or_create(alliance)
 
     # Populate killmail and data within transaction

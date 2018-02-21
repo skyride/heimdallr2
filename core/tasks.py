@@ -337,22 +337,23 @@ def parse_esi(json=None, keyhash=None):
     Involved.objects.bulk_create(attackers)
 
     # Populate Items
-    items = []
-    for item in victim['items']:
-        i = Item(
-            kill=km,
-            type_id=item['item_type_id'],
-            singleton=item['singleton'],
-            flag=item['flag']
-        )
+    with transaction.atomic():
+        items = []
+        for item in victim['items']:
+            i = Item(
+                kill=km,
+                type_id=item['item_type_id'],
+                singleton=item['singleton'],
+                flag=item['flag']
+            )
 
-        if "quantity_dropped" in item:
-            i.quantity = item['quantity_dropped']
-        if "quantity_destroyed" in item:
-            i.quantity = item['quantity_destroyed']
-        #i.save()
-        items.append(i)
-    Item.objects.bulk_create(items)
+            if "quantity_dropped" in item:
+                i.quantity = item['quantity_dropped']
+            if "quantity_destroyed" in item:
+                i.quantity = item['quantity_destroyed']
+            #i.save()
+            items.append(i)
+        Item.objects.bulk_create(items)
 
     print(
         "Added Kill ID %s on %s with %s involved from ESI" % (

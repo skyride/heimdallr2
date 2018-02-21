@@ -287,60 +287,71 @@ def parse_esi(json=None, keyhash=None, attempts=0):
         package = package.json()
         victim = package['victim']
 
-    # Populate killmail
-    km = Killmail(
-        id=package['killmail_id'],
-        source_id=3,
-        date=parse_datetime(package['killmail_time']),
-        system_id=package['solar_system_id'],
-        ship_id=victim['ship_type_id'],
-        value=0,
-        damage=victim['damage_taken']
-    )
-
-    if "position" in victim:
-        if "x" in victim['position']:
-            km.x = victim['position']['x']
-            km.y = victim['position']['y']
-            km.z = victim['position']['z']
-
-    db_victim = Involved(
-        kill=km,
-        attacker=False,
-        ship_id=victim['ship_type_id'],
-        damage=0
-    )
-    if "character_id" in victim:
-        db_victim.character = Character.get_or_create(victim['character_id'])
-    if "corporation_id" in victim:
-        db_victim.corporation = Corporation.get_or_create(victim['corporation_id'])
-    if "alliance_id" in victim:
-        db_victim.alliance = Alliance.get_or_create(victim['alliance_id'])
-
-    km.save()
-
     # Pre-load char/corp/alliance sets so we can fill the database
     chars = set()
     corps = set()
     alliances = set()
+
+    if "character_id" in victim:
+        chars.add(victim['character_id'])
+    if "corporation_id" in victim:
+        corps.add(victim['corporation_id'])
+    if "alliance_id" in victim:
+        alliances.add(victim['alliance_id'])
+
     for attacker in package['attackers']:
         if "character_id" in attacker:
             chars.add(attacker['character_id'])
         if "corporation_id" in attacker:
-            chars.add(attacker['corporation_id'])
+            corps.add(attacker['corporation_id'])
         if "alliance_id" in attacker:
-            chars.add(attacker['alliance_id'])
+            alliances.add(attacker['alliance_id'])
 
     # Now call get_or_create to preload them in the database
     for char in chars:
+        print(char)
         Character.get_or_create(char)
     for corp in corps:
+        print(corp)
         Corporation.get_or_create(corp)
     for alliance in alliances:
+        print(alliance)
         Alliance.get_or_create(alliance)
 
-    # Populate attackers
+    # Populate killmail and data within transaction
     with transaction.atomic():
+        km = Killmail(
+            id=package['killmail_id'],
+            source_id=3,
+            date=parse_datetime(package['killmail_time']),
+            system_id=package['solar_system_id'],
+            ship_id=victim['ship_type_id'],
+            value=0,
+            damage=victim['damage_taken']
+        )
+
+        if "position" in victim:
+            if "x" in victim['position']:
+                km.x = victim['position']['x']
+                km.y = victim['position']['y']
+                km.z = victim['position']['z']
+
+        db_victim = Involved(
+            kill=km,
+            attacker=False,
+            ship_id=victim['ship_type_id'],
+            damage=0
+        )
+        if "character_id" in victim:
+            db_victim.character = Character.get_or_create(victim['character_id'])
+        if "corporation_id" in victim:
+            db_victim.corporation = Corporation.get_or_create(victim['corporation_id'])
+        if "alliance_id" in victim:
+            db_victim.alliance = Alliance.get_or_create(victim['alliance_id'])
+
+        km.save()
+
+        # Populate attackers
         attackers = [db_victim]
         for attacker in package['attackers']:
             a = Involved(
@@ -365,8 +376,7 @@ def parse_esi(json=None, keyhash=None, attempts=0):
             attackers.append(a)
         Involved.objects.bulk_create(attackers)
 
-    # Populate Items
-    with transaction.atomic():
+        # Populate Items
         items = []
         for item in victim['items']:
             i = Item(
@@ -391,6 +401,8 @@ def parse_esi(json=None, keyhash=None, attempts=0):
             len(attackers)
         )
     )
+
+    return km
 
 
 @app.task(name="parse_crest", queue="low")

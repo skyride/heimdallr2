@@ -311,30 +311,51 @@ def parse_esi(json=None, keyhash=None):
 
     km.save()
 
-    # Populate attackers
-    attackers = [db_victim]
+    # Pre-load char/corp/alliance sets so we can fill the database
+    chars = set()
+    corps = set()
+    alliances = set()
     for attacker in package['attackers']:
-        a = Involved(
-            kill=km,
-            damage=attacker['damage_done']
-        )
-
-        if "final_blow" in attacker:
-            a.final_blow = attacker['final_blow']
         if "character_id" in attacker:
-            a.character = Character.get_or_create(attacker['character_id'])
+            chars.add(attacker['character_id'])
         if "corporation_id" in attacker:
-            a.corporation = Corporation.get_or_create(attacker['corporation_id'])
+            chars.add(attacker['corporation_id'])
         if "alliance_id" in attacker:
-            a.alliance = Alliance.get_or_create(attacker['alliance_id'])
+            chars.add(attacker['alliance_id'])
 
-        if "ship_type_id" in attacker:
-            a.ship_id = attacker['ship_type_id']
-        if "weapon_type_id" in attacker:
-            a.weapon_id = attacker['weapon_type_id']
-        #a.save()
-        attackers.append(a)
-    Involved.objects.bulk_create(attackers)
+    # Now call get_or_create to preload them in the database
+    for char in chars:
+        Character.get_or_create(char)
+    for corp in corps:
+        Corporation.get_or_create(corp)
+    for alliance in alliances:
+        Alliance.get_or_create(alliance)
+
+    # Populate attackers
+    with transaction.atomic():
+        attackers = [db_victim]
+        for attacker in package['attackers']:
+            a = Involved(
+                kill=km,
+                damage=attacker['damage_done']
+            )
+
+            if "final_blow" in attacker:
+                a.final_blow = attacker['final_blow']
+            if "character_id" in attacker:
+                a.character_id = attacker['character_id']
+            if "corporation_id" in attacker:
+                a.corporation_id = attacker['corporation_id']
+            if "alliance_id" in attacker:
+                a.alliance_id = attacker['alliance_id']
+
+            if "ship_type_id" in attacker:
+                a.ship_id = attacker['ship_type_id']
+            if "weapon_type_id" in attacker:
+                a.weapon_id = attacker['weapon_type_id']
+            #a.save()
+            attackers.append(a)
+        Involved.objects.bulk_create(attackers)
 
     # Populate Items
     with transaction.atomic():

@@ -280,7 +280,7 @@ def parse_esi(json=None, keyhash=None, attempts=0):
         if package.status_code != 200:
             if attempts < 5:
                 sleep(1)
-                return parse_esi(keyhash=keyhash)
+                return parse_esi(keyhash=keyhash, attempts=attempts+1)
             else:
                 print("Error fetching kill ID %s from ESI" % keyhash[0])
                 return None

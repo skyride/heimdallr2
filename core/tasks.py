@@ -284,6 +284,7 @@ def parse_esi(json=None, keyhash=None, attempts=0):
             else:
                 print("Error fetching kill ID %s from ESI" % keyhash[0])
                 return None
+        package = package.json()
         victim = package['victim']
 
     # Populate killmail

@@ -1,4 +1,5 @@
 from datetime import datetime
+from time import sleep
 
 import ujson
 import requests
@@ -11,8 +12,6 @@ from heimdallr.celery import app
 from core.helpers import parse_crest_date
 from core.models import Killmail, Involved, Item, Character, Corporation, Alliance
 from sde.models import System, Type
-
-
 
 
 
@@ -264,7 +263,7 @@ def parse_zkill_api(json):
 
 
 @app.task(name="parse_esi", queue="low")
-def parse_esi(json=None, keyhash=None):
+def parse_esi(json=None, keyhash=None, attempts=0):
     if json != None:
         package = ujson.loads(json)
         victim = package['victim']
@@ -276,7 +275,15 @@ def parse_esi(json=None, keyhash=None):
             print("Kill ID %s already exists" % keyhash[0])
             return
 
-        package = requests.get("https://esi.tech.ccp.is/latest/killmails/%s/%s/" % (keyhash[0], keyhash[1])).json()
+
+        package = requests.get("https://esi.tech.ccp.is/latest/killmails/%s/%s/" % (keyhash[0], keyhash[1]))
+        if package.status_code != 200:
+            if attempts < 5:
+                sleep(1)
+                return parse_esi(keyhash=keyhash)
+            else:
+                print("Error fetching kill ID %s from ESI" % keyhash[0])
+                return None
         victim = package['victim']
 
     # Populate killmail

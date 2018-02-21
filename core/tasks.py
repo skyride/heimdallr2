@@ -309,13 +309,10 @@ def parse_esi(json=None, keyhash=None, attempts=0):
 
     # Now call get_or_create to preload them in the database
     for char in chars:
-        print(char)
         Character.get_or_create(char)
     for corp in corps:
-        print(corp)
         Corporation.get_or_create(corp)
     for alliance in alliances:
-        print(alliance)
         Alliance.get_or_create(alliance)
 
     # Populate killmail and data within transaction

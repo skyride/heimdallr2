@@ -407,6 +407,7 @@ def parse_esi(json=None, keyhash=None, attempts=0, source_id=3):
             km.value = float(km.ship.sell)
         else:
             km.value = km.value + float(km.ship.sell)
+        km.save()
 
     print(
         "Added Kill ID %s on %s with %s involved from ESI" % (
